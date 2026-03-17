@@ -1,0 +1,28 @@
+{
+  "name": "cyd-optimization-team",
+  "leadAgentId": "d478842103064cee93fde797276484d8",
+  "workspacePath": "c:/Users/60496/WorkBuddy/20260317184320",
+  "createdAt": "2026-03-17T13:34:11.438Z",
+  "options": {
+    "workspacePath": "c:/Users/60496/WorkBuddy/20260317184320",
+    "isAutoTeam": false
+  },
+  "members": [
+    {
+      "memberId": "team-lead@cyd-optimization-team",
+      "name": "team-lead",
+      "role": "Team Lead - coordinates the team and interacts with the user"
+    },
+    {
+      "memberId": "db-architect@cyd-optimization-team",
+      "name": "db-architect",
+      "role": "数据库架构设计与优化"
+    },
+    {
+      "memberId": "data-analyst@cyd-optimization-team",
+      "name": "data-analyst",
+      "role": "数据分析与可视化方案"
+    }
+  ],
+  "isAutoTeam": false
+}
