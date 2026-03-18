@@ -11,7 +11,7 @@ echo ""
 
 # 配置
 APP_DIR="/app"
-REPO_URL="git@github.com:pengx2301-art/cydzhanlue.git"
+REPO_URL="https://github.com/pengx2301-art/cydzhanlue.git"
 TEMP_DIR="$APP_DIR/temp_deploy"
 BACKUP_DIR="$APP_DIR/backup_$(date +%Y%m%d_%H%M%S)"
 
