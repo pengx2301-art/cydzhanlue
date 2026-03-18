@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速下单 - 充易达系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* 商品选择 */
+        .product-selector {
+            margin-bottom: 20px;
+        }
+
+        .product-selector label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .product-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .product-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-control.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* 手机号归属地显示 */
+        .phone-location {
+            margin-top: 8px;
+            padding: 10px 15px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            border-left: 4px solid #2196f3;
+            font-size: 14px;
+            color: #1976d2;
+            display: none;
+        }
+
+        .phone-location.show {
+            display: block;
+        }
+
+        .phone-location strong {
+            color: #0d47a1;
+        }
+
+        /* 按钮 */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 参数输入区域 */
+        .parameters-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .parameter-item {
+            margin-bottom: 15px;
+        }
+
+        .parameter-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 金额显示 */
+        .amount-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .amount-display .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .amount-display .value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        /* 成功消息 */
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* 自定义验证提示 */
+        .validation-tip {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+
+            .amount-display .value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>⚡ 快速下单</h1>
+                <p>选择商品，填写参数，一键下单</p>
+            </div>
+
+            <!-- 商品选择 -->
+            <div class="product-selector">
+                <label for="product-select">选择商品</label>
+                <select id="product-select" class="product-select" onchange="loadProductParameters()">
+                    <option value="">请选择商品...</option>
+                </select>
+            </div>
+
+            <!-- 金额显示 -->
+            <div class="amount-display" id="amount-display" style="display: none;">
+                <div class="label">订单金额</div>
+                <div class="value">¥<span id="amount-value">0.00</span></div>
+            </div>
+
+            <!-- 参数输入区域 -->
+            <div class="parameters-container" id="parameters-container" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">订单参数</h3>
+                <div id="parameters-list"></div>
+            </div>
+
+            <!-- 成功消息 -->
+            <div class="success-message" id="success-message">
+                <strong>✅ 订单创建成功！</strong>
+                <p>订单号：<span id="order-id"></span></p>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button class="btn btn-primary" id="submit-btn" onclick="submitOrder()" disabled>
+                确认下单
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentProduct = null;
+        let currentParameters = [];
+        let formValues = {};
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+        });
+
+        // 加载商品列表（模拟数据，实际应从API获取）
+        function loadProducts() {
+            // 这里应该从API获取已上架的商品列表
+            // const response = await fetch('/api/products/onboarded');
+            // const result = await response.json();
+
+            // 模拟数据
+            const products = [
+                {
+                    id: 'PROD_dayuanren_001',
+                    name: '话费充值-10元',
+                    price: 10,
+                    description: '全国通用，即时到账'
+                },
+                {
+                    id: 'PROD_dayuanren_002',
+                    name: '话费充值-20元',
+                    price: 20,
+                    description: '全国通用，即时到账'
+                },
+                {
+                    id: 'PROD_dayuanren_003',
+                    name: '话费充值-50元',
+                    price: 50,
+                    description: '全国通用，即时到账'
+                },
+                {
+                    id: 'PROD_dayuanren_004',
+                    name: '话费充值-100元',
+                    price: 100,
+                    description: '全国通用，即时到账'
+                }
+            ];
+
+            const select = document.getElementById('product-select');
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ¥${product.price}`;
+                select.appendChild(option);
+            });
+        }
+
+        // 加载商品参数
+        async function loadProductParameters() {
+            const productId = document.getElementById('product-select').value;
+            
+            if (!productId) {
+                document.getElementById('parameters-container').style.display = 'none';
+                document.getElementById('amount-display').style.display = 'none';
+                document.getElementById('submit-btn').disabled = true;
+                return;
+            }
+
+            try {
+                // 获取商品参数配置
+                const response = await fetch(`/api/products/${productId}/parameters`);
+                const result = await response.json();
+
+                if (result.success) {
+                    currentParameters = result.data;
+                    renderParameters(currentParameters);
+                    
+                    // 显示金额
+                    const select = document.getElementById('product-select');
+                    const option = select.options[select.selectedIndex];
+                    const price = parseFloat(option.textContent.match(/¥(\d+(\.\d+)?)/)[1]);
+                    document.getElementById('amount-value').textContent = price.toFixed(2);
+                    document.getElementById('amount-display').style.display = 'block';
+                    document.getElementById('parameters-container').style.display = 'block';
+                    document.getElementById('submit-btn').disabled = false;
+                }
+            } catch (error) {
+                console.error('加载参数失败:', error);
+            }
+        }
+
+        // 渲染参数输入框
+        function renderParameters(parameters) {
+            const container = document.getElementById('parameters-list');
+            container.innerHTML = '';
+            formValues = {};
+
+            parameters.forEach(param => {
+                const div = document.createElement('div');
+                div.className = 'parameter-item form-group';
+                div.innerHTML = `
+                    <label>${param.label} ${param.required ? '<span style="color: #e74c3c;">*</span>' : ''}</label>
+                    ${renderInput(param)}
+                    <div class="error-message" id="error-${param.name}">${param.errorMessage || '输入错误'}</div>
+                    <div class="phone-location" id="location-${param.name}"></div>
+                `;
+                container.appendChild(div);
+
+                // 添加事件监听
+                const input = div.querySelector('input, select, textarea');
+                if (input) {
+                    input.addEventListener('input', (e) => {
+                        handleInputChange(param.name, e.target.value, param);
+                    });
+                    input.addEventListener('change', (e) => {
+                        handleInputChange(param.name, e.target.value, param);
+                    });
+                }
+            }
+        }
+
+        // 渲染不同类型的输入框
+        function renderInput(param) {
+            const commonProps = `
+                name="${param.name}"
+                class="form-control"
+                ${param.required ? 'required' : ''}
+                placeholder="${param.placeholder || ''}"
+            `;
+
+            switch (param.type) {
+                case 'text':
+                    return `<input type="text" ${commonProps} pattern="${param.pattern || ''}">`;
+                case 'number':
+                    return `<input type="number" ${commonProps} 
+                        min="${param.min || ''}" 
+                        max="${param.max || ''}" 
+                        step="${param.step || 'any'}">`;
+                case 'select':
+                    return `<select ${commonProps}>
+                        ${param.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+                    </select>`;
+                case 'textarea':
+                    return `<textarea ${commonProps} rows="4" maxlength="${param.maxLength || ''}"></textarea>`;
+                default:
+                    return `<input type="text" ${commonProps}>`;
+            }
+        }
+
+        // 处理输入变化
+        async function handleInputChange(paramName, value, param) {
+            formValues[paramName] = value;
+
+            // 实时验证（如手机号归属地查询）
+            if (param.realtimeValidation && param.realtimeFunction === 'getPhoneLocation') {
+                const locationDiv = document.getElementById(`location-${paramName}`);
+                const input = document.querySelector(`[name="${paramName}"]`);
+
+                // 验证手机号格式
+                if (/^1[3-9]\d{9}$/.test(value)) {
+                    locationDiv.innerHTML = '<span class="loading">查询归属地中</span>';
+                    locationDiv.classList.add('show');
+                    input.classList.remove('error');
+                    document.getElementById(`error-${paramName}`).classList.remove('show');
+
+                    try {
+                        const response = await fetch('/api/orders/validate-parameter', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                paramName: paramName,
+                                value: value
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.valid) {
+                            locationDiv.innerHTML = `📍 <strong>${result.message}</strong>`;
+                        } else {
+                            locationDiv.innerHTML = `<span style="color: #e74c3c;">${result.message}</span>`;
+                            input.classList.add('error');
+                            document.getElementById(`error-${paramName}`).textContent = result.message;
+                            document.getElementById(`error-${paramName}`).classList.add('show');
+                        }
+                    } catch (error) {
+                        console.error('验证失败:', error);
+                        locationDiv.innerHTML = '<span style="color: #e74c3c;">查询失败，请稍后重试</span>';
+                    }
+                } else if (value.length === 11) {
+                    locationDiv.innerHTML = '<span style="color: #e74c3c;">手机号格式不正确</span>';
+                    input.classList.add('error');
+                    document.getElementById(`error-${paramName}`).textContent = '请输入有效的11位手机号码';
+                    document.getElementById(`error-${paramName}`).classList.add('show');
+                } else {
+                    locationDiv.classList.remove('show');
+                    input.classList.remove('error');
+                    document.getElementById(`error-${paramName}`).classList.remove('show');
+                }
+            }
+        }
+
+        // 提交订单
+        async function submitOrder() {
+            const productId = document.getElementById('product-select').value;
+            const submitBtn = document.getElementById('submit-btn');
+
+            // 验证必填参数
+            const missingParams = currentParameters.filter(p => p.required && !formValues[p.name]);
+            if (missingParams.length > 0) {
+                alert(`请填写必填参数: ${missingParams.map(p => p.label).join(', ')}`);
+                return;
+            }
+
+            // 禁用按钮
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+
+            try {
+                const response = await fetch('/api/orders/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        productName: document.getElementById('product-select').options[document.getElementById('product-select').selectedIndex].text,
+                        parameters: formValues,
+                        amount: parseFloat(document.getElementById('amount-value').textContent),
+                        memberId: 'MEMBER001' // 应从用户登录信息获取
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 显示成功消息
+                    document.getElementById('order-id').textContent = result.data.orderId;
+                    document.getElementById('success-message').classList.add('show');
+
+                    // 3秒后重置表单
+                    setTimeout(() => {
+                        resetForm();
+                    }, 3000);
+                } else {
+                    alert(result.message || '订单创建失败');
+                }
+            } catch (error) {
+                console.error('提交订单失败:', error);
+                alert('提交订单失败，请稍后重试');
+            } finally {
+                // 恢复按钮
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确认下单';
+            }
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('product-select').value = '';
+            document.getElementById('parameters-container').style.display = 'none';
+            document.getElementById('amount-display').style.display = 'none';
+            document.getElementById('success-message').classList.remove('show');
+            document.getElementById('submit-btn').disabled = true;
+            currentParameters = [];
+            formValues = {};
+        }
+    </script>
+</body>
+</html>

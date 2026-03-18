@@ -1,0 +1,25 @@
+{
+  "name": "cyd-system-enhanced",
+  "version": "2.0.0",
+  "description": "充易达系统 - 增强版，支持商品对接、自定义参数、手机号归属地查询",
+  "main": "api-server.js",
+  "scripts": {
+    "start": "node api-server.js",
+    "dev": "nodemon api-server.js"
+  },
+  "keywords": [
+    "phone-recharge",
+    "product-connection",
+    "order-management"
+  ],
+  "author": "WorkBuddy AI",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
