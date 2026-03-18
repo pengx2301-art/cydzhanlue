@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>总后台 - 充易达系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            color: white;
+            border-left-color: #667eea;
+        }
+
+        .menu-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* 页面内容 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .stat-card .trend {
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .stat-card .trend.up {
+            color: #27ae60;
+        }
+
+        .stat-card .trend.down {
+            color: #e74c3c;
+        }
+
+        /* 表格样式 */
+        .data-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 30px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        td {
+            color: #34495e;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 表单样式 */
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Toast通知 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.info {
+            background: #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-btn:hover {
+            color: #2c3e50;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* 加载动画 */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>充易达</h2>
+            <p>管理后台</p>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" onclick="showPage('dashboard')">
+                <span class="menu-icon">📊</span>
+                <span>仪表盘</span>
+            </div>
+            <div class="menu-item" onclick="showPage('users')">
+                <span class="menu-icon">👥</span>
+                <span>用户管理</span>
+            </div>
+            <div class="menu-item" onclick="showPage('orders')">
+                <span class="menu-icon">📦</span>
+                <span>订单管理</span>
+            </div>
+            <div class="menu-item" onclick="showPage('topup')">
+                <span class="menu-icon">💰</span>
+                <span>加款审核</span>
+            </div>
+            <div class="menu-item" onclick="showPage('suppliers')">
+                <span class="menu-icon">🏪</span>
+                <span>供货商管理</span>
+            </div>
+            <div class="menu-item" onclick="showPage('products')">
+                <span class="menu-icon">🛍️</span>
+                <span>商品管理</span>
+            </div>
+            <div class="menu-item" onclick="showPage('zilaidan')">
+                <span class="menu-icon">📡</span>
+                <span>自来单管理</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 头部 -->
+        <div class="header">
+            <h1 id="pageTitle">仪表盘</h1>
+            <div class="header-info">
+                <span id="adminName">管理员</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+
+        <!-- 仪表盘页面 -->
+        <div id="dashboard" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>总用户数</h3>
+                    <div class="value" id="totalUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>总订单数</h3>
+                    <div class="value" id="totalOrders">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>总余额</h3>
+                    <div class="value">¥<span id="totalBalance">0.00</span></div>
+                </div>
+                <div class="stat-card">
+                    <h3>总营收</h3>
+                    <div class="value">¥<span id="totalRevenue">0.00</span></div>
+                </div>
+                <div class="stat-card">
+                    <h3>供货商数</h3>
+                    <div class="value" id="totalSuppliers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今日订单</h3>
+                    <div class="value" id="todayOrders">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今日营收</h3>
+                    <div class="value">¥<span id="todayRevenue">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户管理页面 -->
+        <div id="users" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>用户列表</h2>
+                    <div class="table-actions">
+                        <button class="btn btn-primary" onclick="openModal('addUserModal')">添加用户</button>
+                        <input type="text" id="userSearch" placeholder="搜索手机号" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>手机号</th>
+                            <th>用户名</th>
+                            <th>余额</th>
+                            <th>总消费</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 订单管理页面 -->
+        <div id="orders" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>订单列表</h2>
+                    <div class="table-actions">
+                        <select id="orderStatusFilter" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                            <option value="">全部状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="processing">处理中</option>
+                            <option value="success">成功</option>
+                            <option value="failed">失败</option>
+                        </select>
+                        <input type="text" id="orderSearch" placeholder="搜索订单号" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>用户</th>
+                            <th>商品</th>
+                            <th>账号</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 加款审核页面 -->
+        <div id="topup" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>加款申请</h2>
+                    <select id="topupStatusFilter" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                        <option value="">全部状态</option>
+                        <option value="pending">待审核</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已拒绝</option>
+                    </select>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>申请单号</th>
+                            <th>用户</th>
+                            <th>金额</th>
+                            <th>说明</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topupTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 供货商管理页面 -->
+        <div id="suppliers" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>供货商列表</h2>
+                    <button class="btn btn-primary" onclick="openModal('addSupplierModal')">添加供货商</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>API地址</th>
+                            <th>测试状态</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplierTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 商品管理页面 -->
+        <div id="products" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>商品列表</h2>
+                    <div class="table-actions">
+                        <button class="btn btn-primary" onclick="openModal('addProductModal')">添加商品</button>
+                        <select id="productCategoryFilter" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                            <option value="">全部分类</option>
+                            <option value="phone">话费</option>
+                            <option value="qq">QQ</option>
+                            <option value="game">游戏</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>商品名称</th>
+                            <th>分类</th>
+                            <th>供货商</th>
+                            <th>售价</th>
+                            <th>成本价</th>
+                            <th>库存</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 自来单管理页面 -->
+        <div id="zilaidan" class="page">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h2>自来单订单</h2>
+                    <div class="table-actions">
+                        <button class="btn btn-primary" onclick="fetchZilaidanOrders()">拉取订单</button>
+                        <select id="zilaidanPlatformFilter" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
+                            <option value="">全部平台</option>
+                            <option value="mifenghuiyun">蜜蜂汇云</option>
+                            <option value="kekebang">客客帮</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>平台订单ID</th>
+                            <th>平台</th>
+                            <th>账号</th>
+                            <th>金额</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="zilaidanTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加用户模态框 -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加用户</h2>
+                <button class="close-btn" onclick="closeModal('addUserModal')">&times;</button>
+            </div>
+            <form onsubmit="addUser(event)">
+                <div class="form-group">
+                    <label>手机号 *</label>
+                    <input type="tel" id="addUserPhone" required placeholder="请输入手机号">
+                </div>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="addUserName" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码 *</label>
+                    <input type="password" id="addUserPassword" required placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label>初始余额</label>
+                    <input type="number" id="addUserBalance" value="0" step="0.01">
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addUserModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加供货商模态框 -->
+    <div id="addSupplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加供货商</h2>
+                <button class="close-btn" onclick="closeModal('addSupplierModal')">&times;</button>
+            </div>
+            <form onsubmit="addSupplier(event)">
+                <div class="form-group">
+                    <label>供货商名称 *</label>
+                    <input type="text" id="addSupplierName" required placeholder="请输入供货商名称">
+                </div>
+                <div class="form-group">
+                    <label>供货商类型 *</label>
+                    <select id="addSupplierType" required>
+                        <option value="mifenghuiyun">蜜蜂汇云</option>
+                        <option value="kekebang">客客帮</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>API地址 *</label>
+                    <input type="url" id="addSupplierApiUrl" required placeholder="https://api.example.com">
+                </div>
+                <div class="form-group">
+                    <label>API密钥</label>
+                    <input type="text" id="addSupplierApiKey" placeholder="请输入API密钥">
+                </div>
+                <div class="form-group">
+                    <label>API密钥</label>
+                    <input type="text" id="addSupplierApiSecret" placeholder="请输入API密钥">
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addSupplierModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加商品模态框 -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加商品</h2>
+                <button class="close-btn" onclick="closeModal('addProductModal')">&times;</button>
+            </div>
+            <form onsubmit="addProduct(event)">
+                <div class="form-group">
+                    <label>商品名称 *</label>
+                    <input type="text" id="addProductName" required placeholder="请输入商品名称">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="addProductCategory">
+                        <option value="phone">话费</option>
+                        <option value="qq">QQ</option>
+                        <option value="game">游戏</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>供货商 *</label>
+                    <select id="addProductSupplier" required>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>售价 *</label>
+                    <input type="number" id="addProductPrice" required step="0.01" placeholder="请输入售价">
+                </div>
+                <div class="form-group">
+                    <label>成本价</label>
+                    <input type="number" id="addProductCostPrice" step="0.01" placeholder="请输入成本价">
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('addProductModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
